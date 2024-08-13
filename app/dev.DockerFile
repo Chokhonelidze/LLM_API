@@ -1,10 +1,10 @@
-FROM python:3.9 as base 
+FROM python as base 
 
 #RUN pip install pipenv
 
 RUN pip install psycopg2-binary
 
-ENV PROJECT_DIR /usr/local/src/webapp
+ENV PROJECT_DIR /usr/local/src/app
 ENV SRC_DIR ${PROJECT_DIR}/api
 
 COPY requirements.txt ${PROJECT_DIR}/
@@ -25,7 +25,7 @@ FROM base as dev
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-RUN python -m pip install git+https://github.com/pytube/pytube
+# RUN python -m pip install git+https://github.com/pytube/pytube
 
 
 

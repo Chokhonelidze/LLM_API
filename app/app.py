@@ -2,33 +2,41 @@ from api import app
 
 from ariadne import load_schema_from_path, make_executable_schema, \
     graphql_sync, snake_case_fallback_resolvers, ObjectType
-from ariadne.constants import PLAYGROUND_HTML
+#from ariadne.constants import PLAYGROUND_HTML
 from flask import request, jsonify
 
 
-from api.schemas.test import tests
-from api.resolvers.test import test_resolver
+from api.schemas.openAi import openAi
+from api.resolvers.openAi import openAI_resolver
 
 @app.route("/graphql", methods=["GET"])
 def graphql_playground():
-    return PLAYGROUND_HTML, 200
+    html = """
+    <div style="width: 100%; height: 100%;" id='embedded-sandbox'></div>
+    <script src="https://embeddable-sandbox.cdn.apollographql.com/_latest/embeddable-sandbox.umd.production.min.js"></script> 
+    <script>
+    new window.EmbeddedSandbox({
+        target: '#embedded-sandbox',
+        initialEndpoint: 'http://localhost:8080/graphql',
+        includeCookies: false,
+    });
+    </script>
+    """
+    return html, 200
 
-
-
-
-test_resolver = {
-    "type":tests["type"],
-    "query":tests["query"],
-    "mutation":tests["mutation"],
-    "query_resolver":test_resolver["queries"],
-    "mutations_resolver":test_resolver["mutations"]
+graphql_resolver = {
+    "type":openAi["type"],
+    "query":openAi["query"],
+    "mutation":openAi["mutation"],
+    "query_resolver":openAI_resolver["queries"],
+    "mutations_resolver":openAI_resolver["mutations"]
 }
 
 type_defs = ""
 type=[]
 query=[]
 mutation=[]
-objs = [test_resolver]
+objs = [graphql_resolver]
 
 query_resolver = ObjectType("Query")
 
