@@ -27,7 +27,7 @@ def assignQuizToUsers(obj,info,input):
 @convert_kwargs_to_snake_case
 def getAllUsersForQuiz(obj,info,quiz):
     try:
-        users = mongo.db.QuizUsers.find()
+        users = mongo.db.QuizUsers.find({"quizID":quiz})
         payload = {
             "success":True,
             "users":users

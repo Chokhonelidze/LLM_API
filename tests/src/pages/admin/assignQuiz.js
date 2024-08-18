@@ -83,7 +83,7 @@ export default function AssignQuiz() {
         {data && data.length > 0 ? <>
         <div className="row mt-5">
             <div className="col">
-                <select className="form-select" onSelect={(e)=>{setSelected(e.target.value);}}>
+                <select className="form-select" onChange={(e)=>{setSelected(e.target.value)}}>
                     {options}
                 </select>
             </div>
@@ -118,7 +118,14 @@ export default function AssignQuiz() {
                     const date = new Date(item?.end_date*1000)
                     return (
                         <tr className={className} key={"row_item_"+index}>
-                        <th><input className="form-control" type="text" value={item?.['_id']} disabled/></th>
+                        <th>
+                        <div class="input-group mb-3">
+                        <input type="text" className="form-control" placeholder="Recipient's username" value={item?.['_id']}  disabled/>
+                        <span className="input-group-text" id="basic-addon2" style={{cursor:"pointer"}} onClick={()=>{
+                            navigator.clipboard.writeText(item?.['_id']);
+                        }}>&#128190;</span>
+                        </div>
+                        </th>
                         <td>
                         {item?.score?<input className="form-control" type="text" value={item?.name}  disabled/>:
                     <input className="form-control" type="text" value={item?.name} onChange={(e)=>{
