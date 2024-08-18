@@ -105,7 +105,7 @@ export default function CheckScore() {
       <div className="row">
         <div className="col-4"></div>
         <div className="col-4">
-          <h2 className="text-info">Your Score Is:{score}%</h2>
+          <h2 className="text-info">Your Score Is: <b className="text-primary">{score}%</b></h2>
         </div>
         <div className="col-4"></div>
       </div>
