@@ -26,3 +26,35 @@ class Quiz:
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
+    
+
+class QuizUsers:
+    def __init__(self, quizId, answers=[], score=0, startDate=None,endDate=None, _id=None):
+        self.quizID = quizId
+        self.answers = answers
+        self.score = score
+        self.startDate = startDate if startDate else datetime.datetime.now(tz=datetime.timezone.utc)
+        self.endDate = endDate if endDate else None
+        self._id = _id if _id else ObjectId()
+    def to_dict(self):
+        return {
+            "quizID": self.quizID,
+            "answers": self.answers,
+            "score": self.score,
+            "startDate":self.startDate,
+            "endDate":self.endDate,
+            "_id": self._id
+        }
+    @staticmethod
+    def from_dict(data):
+        return QuizUsers(
+            quizID=data.get('quizID'),
+            answers=data.get('answers'),
+            score=data.get('score'),
+            startDate=data.get('startDate'),
+            endDate=data.get('endDate'),
+            _id=data.get('_id')
+            )
+
+    def __repr__(self):
+        return f"Post('{self.QuizUsers}', '{self.startDate}')"

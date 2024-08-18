@@ -5,9 +5,10 @@ from ariadne import load_schema_from_path, make_executable_schema, \
 #from ariadne.constants import PLAYGROUND_HTML
 from flask import request, jsonify
 
-
 from api.schemas.openAi import openAi
 from api.resolvers.openAi import openAI_resolver
+from api.schemas.quizUsers import quizUsers
+from api.resolvers.quizUsers import quiz_users_resolver
 
 @app.route("/graphql", methods=["GET"])
 def graphql_playground():
@@ -17,7 +18,7 @@ def graphql_playground():
     <script>
     new window.EmbeddedSandbox({
         target: '#embedded-sandbox',
-        initialEndpoint: 'http://localhost:8080/graphql',
+        initialEndpoint: 'http://localhost:5000/graphql',
         includeCookies: false,
     });
     </script>
@@ -31,12 +32,19 @@ graphql_resolver = {
     "query_resolver":openAI_resolver["queries"],
     "mutations_resolver":openAI_resolver["mutations"]
 }
+quiz_users = {
+    "type":quizUsers["type"],
+    "query":quizUsers["query"],
+    "mutation":quizUsers["mutation"],
+    "query_resolver":quiz_users_resolver["queries"],
+    "mutations_resolver":quiz_users_resolver["mutations"]
+}
 
 type_defs = ""
 type=[]
 query=[]
 mutation=[]
-objs = [graphql_resolver]
+objs = [graphql_resolver,quiz_users]
 
 query_resolver = ObjectType("Query")
 
@@ -62,7 +70,7 @@ schema = make_executable_schema(
 )
 
 
-@app.route("/graphql", methods=["POST"])
+@app.route("/graphql", methods=["POST","OPTIONS"])
 def graphql_server():
     data = request.get_json()
     success, result = graphql_sync(
