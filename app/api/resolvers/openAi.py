@@ -98,7 +98,10 @@ def getQuizForUser(obj,info,user_id):
     data = None
     try:
         user_result = mongo.db.QuizUsers.find_one({"_id":user_id})
-        quiz_id = user_result['quiz_id']
+        print("Test=",user_result,flush=True)
+        if 'score' in user_result.keys() and user_result['score']:
+            return None
+        quiz_id = user_result['quizID']
         data = mongo.db.Quiz.find_one_or_404({"_id":ObjectId(quiz_id)})
 
     except Exception as e:
@@ -111,7 +114,7 @@ def checkQuiz(obj,info,input):
     try:
         user_id = input.get("user_id")
         user_result = mongo.db.QuizUsers.find_one({"_id":user_id})
-        quiz_id = user_result['quiz_id']
+        quiz_id = user_result['quizID']
         answers = user_result['answers']
         score = user_result['score']
         data = mongo.db.Quiz.find_one_or_404({"_id":ObjectId(quiz_id)})
@@ -139,15 +142,15 @@ def submitQuiz(obj,info,input):
         user_id = input.get("user_id")
         answers = input.get("answers")
         user_result = mongo.db.QuizUsers.find_one({"_id":user_id})
-        quiz_id = user_result['quiz_id']
+        quiz_id = user_result['quizID']
         data = mongo.db.Quiz.find_one_or_404({"_id":ObjectId(quiz_id)})
-        score_count = 0;
+        score_count = 0
         for quiz in data['content']:
             question_id = quiz['id']
             if quiz['answer'] == answers[str(int(question_id)-1)]:
                 score_count = score_count + 1
         final_score = int(100 * float(score_count) / float(len(data['content'])))
-        newvalues = { "$set": { 'score':final_score,'answers':answers,'endDate':datetime.datetime.now(tz=datetime.timezone.utc)} }
+        newvalues = { "$set": { 'score':final_score,'answers':answers,'end_date':datetime.datetime.now(tz=datetime.timezone.utc).timestamp()} }
         mongo.db.QuizUsers.update_one({"_id":user_id},newvalues)
         return True
                 

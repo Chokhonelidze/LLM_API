@@ -6,7 +6,7 @@ class Quiz:
     def __init__(self, title, content, date_posted=None, _id=None):
         self.title = title
         self.content = content
-        self.date_posted = date_posted if date_posted else datetime.datetime.now(tz=datetime.timezone.utc)
+        self.date_posted = date_posted if date_posted else datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
         self._id = _id if _id else ObjectId()
     def to_dict(self):
         return {
@@ -29,32 +29,35 @@ class Quiz:
     
 
 class QuizUsers:
-    def __init__(self, quizId, answers=[], score=0, startDate=None,endDate=None, _id=None):
-        self.quizID = quizId
+    def __init__(self, quizID,name, answers=[], score=0, start_date=None,end_date=None, _id=None):
+        self.quizID = quizID
+        self.name = name
         self.answers = answers
         self.score = score
-        self.startDate = startDate if startDate else datetime.datetime.now(tz=datetime.timezone.utc)
-        self.endDate = endDate if endDate else None
+        self.start_date = start_date if start_date else datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
+        self.end_date = end_date if end_date else None
         self._id = _id if _id else ObjectId()
     def to_dict(self):
         return {
             "quizID": self.quizID,
+            "name": self.name,
             "answers": self.answers,
             "score": self.score,
-            "startDate":self.startDate,
-            "endDate":self.endDate,
+            "start_date":self.start_date,
+            "end_date":self.end_date,
             "_id": self._id
         }
     @staticmethod
     def from_dict(data):
         return QuizUsers(
             quizID=data.get('quizID'),
+            name=data.get('name'),
             answers=data.get('answers'),
             score=data.get('score'),
-            startDate=data.get('startDate'),
-            endDate=data.get('endDate'),
+            start_date=data.get('start_date'),
+            end_date=data.get('end_date'),
             _id=data.get('_id')
             )
 
     def __repr__(self):
-        return f"Post('{self.QuizUsers}', '{self.startDate}')"
+        return f"Post('{self.QuizUsers}', '{self.start_date}')"

@@ -13,7 +13,8 @@ def assignQuizToUsers(obj,info,input):
     try:
         users = input.get('users')
         quiz_id = users[0]['quiz_id']
-        mongo.db.QuizUsers.delete_many({"quiz_id":quiz_id})
+        mongo.db.QuizUsers.delete_many({"quizID":quiz_id})
+        users = [QuizUsers(quizID=user['quiz_id'],_id=user['_id'],name=user['name']).to_dict() for user in users]
         insertId = mongo.db.QuizUsers.insert_many(users).inserted_ids
         print(insertId)
     except Exception as e:

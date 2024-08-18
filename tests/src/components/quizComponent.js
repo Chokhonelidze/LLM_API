@@ -28,7 +28,7 @@ export default function QuizComponent({ data,userId}) {
     `;
     await graphql(q,{input:{userID:userId,answers:answers}},null,(response)=>{
       if(response?.submitQuiz){
-
+        setSubmitted(true);
       }
 
     });

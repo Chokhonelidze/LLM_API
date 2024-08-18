@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState } from "react";
 import { graphql } from "../../functions/graphql";
 import * as short from "short-uuid";
-
 export default function AssignQuiz() {
     const [data,setData] = useState([]);
-    const [selected,setSelected] = useState([]);
+    const [selected,setSelected] = useState("");
     const [users,setUsers] = useState([]);
-
-    const loadQuizUsers = async ()=>{
+    const [loading,setLoading] = useState(false);
+    const loadQuizUsers = useCallback(async ()=>{
+        if(!selected) return;
         const q =`query GetAllUsersForQuiz($quiz: ID) {
                         getAllUsersForQuiz(quiz: $quiz) {
                             success
                             errors
                             users {
-                            _id
-                            userName
+                            _id,
+                            name,
+                            score,
+                            end_date
                             }
                         }
                     }`;
@@ -23,8 +25,9 @@ export default function AssignQuiz() {
                 setUsers(response?.getAllUsersForQuiz?.users);
             }
         });
-    }
-    const load = async ()=>{
+    },[selected]);
+    const load = useCallback( async ()=>{
+        setLoading(true);
         const q = `
         query GetAllQuiz {
             getAllQuiz {
@@ -39,8 +42,8 @@ export default function AssignQuiz() {
                 setSelected(response?.getAllQuiz[0]['_id']);
             }
         })
-
-    }
+        setLoading(false);
+    },[]);
     const assignQuizToUsers = async ()=>{
         const q = `
         mutation AssignQuizToUsers($input: AssignUsersInput!) {
@@ -49,7 +52,7 @@ export default function AssignQuiz() {
         `;
         const inputUsers = users.map((item)=>{
             return {
-                userName:item.userName,
+                name:item.name,
                 _id:item?.['_id'],
                 quizID:selected
             }
@@ -62,18 +65,21 @@ export default function AssignQuiz() {
         });
 
     }
+    const goToPage = (id,score)=>{
+        if(id && score){
+            window.open('/checkResults/'+id,'_blank', 'rel=noopener noreferrer');
+        } 
+    }
     useEffect(()=>{
-        load();
-    },[])
+            load();
+    },[load]);
     useEffect(()=>{
-        if(selected){
             loadQuizUsers();
-        }
-    },[selected]);
+    },[loadQuizUsers]);
     const options = data?.map((item,index)=>{
         return <option value={item._id} key={"quizOption_"+index}>{item.title}</option>
-    })
-    return <div className="container">
+    });
+    return loading?<span className="loader"></span>:<div className="container">
         {data && data.length > 0 ? <>
         <div className="row mt-5">
             <div className="col">
@@ -89,26 +95,54 @@ export default function AssignQuiz() {
                 <button className="btn btn-primary" 
                 onClick={()=>{
                     let shot = short.generate();
-                    setUsers([...users,{_id:shot,userName:""}])
+                    setUsers([...users,{_id:shot,name:""}])
                 }}>Add Student</button>
             </div>
             <div className="col-10"></div>
         </div>
-        {users?.map((item,index)=>{
-            return <div className="row mt-2" key={"item_student"+index}>
-                <div className="col-3 ">
-                    <input className="form-control" type="text" value={item?.['_id']} disabled/>
-                </div>
-                <div className="col-3">
-                    <input className="form-control" type="text" value={item?.userName} onChange={(e)=>{
+        <table className="table text-primary table-bordered ">
+            <thead>
+                <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Score</th>
+                <th>Compleated Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {users?.map((item,index)=>{
+                    let className = "";
+                    if(item?.score) {
+                        className = " table-active";
+                    }
+                    const date = new Date(item?.end_date*1000)
+                    return (
+                        <tr className={className} key={"row_item_"+index}>
+                        <th><input className="form-control" type="text" value={item?.['_id']} disabled/></th>
+                        <td>
+                        {item?.score?<input className="form-control" type="text" value={item?.name}  disabled/>:
+                    <input className="form-control" type="text" value={item?.name} onChange={(e)=>{
                         let temp = [...users];
-                        temp[index]['userName'] = e.target.value;
+                        temp[index]['name'] = e.target.value;
                         setUsers(temp);
-                    }}/>
-                </div>
-                <div className="col-6"></div>
-            </div>
-        })}
+                    }}/>}
+                        </td>
+                        <td onClick={()=>{
+                            goToPage(item?.['_id'],item?.score);
+                        }} style={{cursor:"pointer"}}>
+                            {item?.score?item.score+' %':""}
+                        </td>
+                        <td>
+                            {item?.end_date?date.toLocaleString():""}
+                        </td>
+                        </tr>
+                        
+                    )
+
+                })}
+
+            </tbody>
+        </table>
         {users.length > 0?<div className="row mt-2">
             <div className="col-6">
                 <button className="btn btn-primary" onClick={()=>{assignQuizToUsers();}}>Save</button>

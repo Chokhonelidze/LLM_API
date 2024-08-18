@@ -1,7 +1,9 @@
 type = """
 type Users {
     _id:ID!
-    userName:String
+    name:String
+    score:Int
+    end_date:String
 }
 "gets all users for a quiz"
 type usersForQuiz {
@@ -13,7 +15,7 @@ input UserInfo {
     "Random Generated User Id"
     _id:ID!
     "User Name For Quiz"
-    userName:String!
+    name:String!
     "Quiz ID assigned to user"
     quizID:ID!
 }

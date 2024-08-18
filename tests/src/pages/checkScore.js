@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { graphql } from "../functions/graphql";
 
@@ -7,7 +7,7 @@ export default function CheckScore() {
   const [data, setData] = useState([]);
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
-  const load = async () => {
+  const load =useCallback(async () => {
     setLoading(true);
     const q = `
         query CheckQuiz($input: checkQuizInput!) {
@@ -34,12 +34,10 @@ export default function CheckScore() {
       }
     });
     setLoading(false);
-  };
+  },[id]);
   useEffect(() => {
-    if (id) {
       load();
-    }
-  }, [id]);
+  }, [load]);
 
   const Questions = data?.map((mitem, index) => {
     const Options = mitem?.options?.map((item, index) => {

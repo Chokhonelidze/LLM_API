@@ -39,7 +39,7 @@ export default function Home(){
     return <div className="container">
         {loading?<span className="loader"></span>:
         errors?<h3 className="text-danger">{errors}</h3>:
-        data?<div className="row"><QuizComponent data={data}/></div>:<div>
+        data?<div className="row"><QuizComponent data={data} userId={userID}/></div>:<div>
             <form className="row g-3 mt-5">
         <div className="col-auto">
           <label htmlFor="inputPassword2" className="visually-hidden">User Temporary ID</label>
@@ -50,7 +50,7 @@ export default function Home(){
         </div>
         <div className="col-auto">
           <button type="button" className="btn btn-primary mb-3" onClick={()=>{
-            if(userID.length > 0) {
+            if(userID) {
                 loadQuiz();
             }
           }}>Confirm identity</button>
