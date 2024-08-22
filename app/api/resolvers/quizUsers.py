@@ -14,7 +14,13 @@ def assignQuizToUsers(obj,info,input):
         users = input.get('users')
         quiz_id = users[0]['quiz_id']
         mongo.db.QuizUsers.delete_many({"quizID":quiz_id})
-        users = [QuizUsers(quizID=user['quiz_id'],_id=user['_id'],name=user['name']).to_dict() for user in users]
+        users = [QuizUsers(quizID=user['quiz_id'],
+                           _id=user['_id'],
+                           name=user['name'],
+                           start_date=users['start_date'],
+                           end_date=users['end_date'],
+                           score=users['score']
+                           ).to_dict() for user in users]
         insertId = mongo.db.QuizUsers.insert_many(users).inserted_ids
         print(insertId)
     except Exception as e:
